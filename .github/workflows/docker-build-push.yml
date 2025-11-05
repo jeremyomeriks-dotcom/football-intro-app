@@ -48,3 +48,12 @@ jobs:
 
     - name: Image digest
       run: echo "Image pushed with digest ${{ steps.build.outputs.digest }}"
+
+    - name: Debug - List files
+      run: |
+        echo "Current directory:"
+        pwd
+        echo "Files in current directory:"
+        ls -la
+        echo "Checking for Dockerfile:"
+        cat Dockerfile || echo "Dockerfile not found!"
