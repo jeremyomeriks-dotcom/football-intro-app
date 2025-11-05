@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: football-intro-app
-        image: YOUR_DOCKERHUB_USERNAME/football-intro-app:latest
+        image: jeremyopare/football-intro-app:latest
         ports:
         - containerPort: 80
         resources:
