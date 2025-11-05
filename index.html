@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Short Introduction Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #FFFFFF;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1440px;
+            height: auto;
+            min-height: 960px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title {
+            width: 344px;
+            height: 48px;
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 600;
+            font-size: 32px;
+            line-height: 150%;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            letter-spacing: -0.01em;
+            color: #000000;
+            margin-bottom: 80px;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0px;
+            gap: 24px;
+            width: 400px;
+            height: auto;
+        }
+
+        .copy {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0px;
+            gap: 4px;
+            width: 376px;
+            height: 64px;
+            flex: none;
+            order: 0;
+            flex-grow: 0;
+        }
+
+        .copy h1 {
+            width: 357px;
+            height: 36px;
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 600;
+            font-size: 24px;
+            line-height: 150%;
+            text-align: center;
+            letter-spacing: -0.01em;
+            color: #000000;
+            flex: none;
+            order: 0;
+            flex-grow: 0;
+        }
+
+        .copy p {
+            width: 376px;
+            height: 24px;
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 150%;
+            text-align: center;
+            color: #000000;
+            flex: none;
+            order: 1;
+            flex-grow: 0;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0px;
+            gap: 16px;
+            width: 400px;
+            height: auto;
+            margin-bottom: 8px;
+        }
+
+        .field {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 8px 16px;
+            gap: 16px;
+            width: 400px;
+            height: 40px;
+            background: #FFFFFF;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            flex: none;
+            order: 0;
+            flex-grow: 0;
+        }
+
+        .field input {
+            width: 100%;
+            height: 30px;
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 500;
+            font-size: 20px;
+            line-height: 150%;
+            color: #000000;
+            border: none;
+            outline: none;
+            background: transparent;
+        }
+
+        .field input::placeholder {
+            color: #828282;
+        }
+
+        .field select {
+            width: 100%;
+            height: 30px;
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 500;
+            font-size: 20px;
+            line-height: 150%;
+            color: #000000;
+            border: none;
+            outline: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .field select option {
+            color: #000000;
+            padding: 8px;
+        }
+
+        .field select option:first-child {
+            color: #828282;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0px;
+            gap: 16px;
+            width: 400px;
+            height: auto;
+            margin-top: 16px;
+        }
+
+        .button {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            padding: 0px 16px;
+            gap: 8px;
+            width: 400px;
+            height: 40px;
+            background: #000000;
+            border-radius: 8px;
+            flex: none;
+            order: 1;
+            flex-grow: 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background: #333333;
+        }
+
+        .button span {
+            width: 244px;
+            height: 24px;
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 500;
+            font-size: 16px;
+            line-height: 150%;
+            display: flex;
+            align-items: center;
+            color: #FFFFFF;
+            flex: none;
+            order: 0;
+            flex-grow: 0;
+        }
+
+        .terms {
+            width: 400px;
+            height: auto;
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 150%;
+            text-align: center;
+            color: #828282;
+            margin-top: 24px;
+        }
+
+        .terms a {
+            color: #000000;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .terms a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .content, .input-group, .field, .button-container, .button, .terms {
+                width: 100%;
+                max-width: 400px;
+            }
+            
+            .copy, .copy h1, .copy p {
+                width: 100%;
+            }
+            
+            .title {
+                font-size: 28px;
+                width: 90%;
+                margin-bottom: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">The Short Introduction</h1>
+        
+        <div class="content">
+            <div class="copy">
+                <h1>Create your introduction profile</h1>
+                <p>Enter your name, email, and favorite football team</p>
+            </div>
+            
+            <div class="input-group">
+                <div class="field">
+                    <input type="text" id="name" placeholder="Name">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <div class="field">
+                    <input type="email" id="email" placeholder="email@domain.com">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <div class="field">
+                    <select id="football-team">
+                        <option value="" disabled selected>Football (Soccer) Team</option>
+                        <option value="Chelsea">Chelsea</option>
+                        <option value="Man United">Man United</option>
+                        <option value="Man City">Man City</option>
+                        <option value="Arsenal">Arsenal</option>
+                        <option value="Tottenham (Spurs)">Tottenham (Spurs)</option>
+                        <option value="Liverpool">Liverpool</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="button-container">
+                <div class="button" id="submit-button">
+                    <span>Submit introduction information</span>
+                </div>
+            </div>
+            
+            <div class="terms">
+                By clicking continue, you agree to the <a href="#">Policy of disclosing sensitive information</a> and the <a href="#">Level of Banter & Disrespect associated with your team.</a>
+            </div>
+        </div>
+    </div>
+
+ <script>
+ document.getElementById('submit-button').addEventListener('click', function() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const team = document.getElementById('football-team').value;
+            
+            if (!name || !email || !team) {
+                alert('Please fill in all fields before submitting.');
+                return;
+            }
+            
+            // Store the data in localStorage to pass to the team page
+            localStorage.setItem('userName', name);
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('userTeam', team);
+            
+ switch(team) {
+                case 'Chelsea':
+                    window.location.href = 'chelseacard.html';
+                    break;
+                case 'Man United':
+                    window.location.href = 'manunitedcard.html';
+                    break;
+                case 'Man City':
+                    window.location.href = 'mancitycard.html';
+                    break;
+                case 'Arsenal':
+                    window.location.href = 'arsenalcard.html';
+                    break;
+                case 'Tottenham (Spurs)':
+                    window.location.href = 'tottenhamcard.html';
+                    break;
+                case 'Liverpool':
+                    window.location.href = 'liverpoolcard.html';
+                    break;
+                default:
+                    alert('Team page not found.');
+            }
+        });
+    </script>
+</body>
+</html>

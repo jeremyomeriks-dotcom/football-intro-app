@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arsenal FC Introduction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #FFFFFF;
+            padding: 20px;
+        }
+
+        .container {
+            position: relative;
+            width: 1440px;
+            height: 960px;
+            background: #FFFFFF;
+            display: flex;
+        }
+
+        .left-section {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+        }
+
+        .title {
+            width: 344px;
+            height: 48px;
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 600;
+            font-size: 32px;
+            line-height: 150%;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            letter-spacing: -0.01em;
+            color: #000000;
+            margin-bottom: 40px;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0px;
+            gap: 24px;
+            width: 400px;
+            height: 168px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0px;
+            gap: 16px;
+            width: 400px;
+            height: 40px;
+            margin-bottom: 8px;
+        }
+
+        .field {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 8px 16px;
+            gap: 16px;
+            width: 400px;
+            height: 40px;
+            background: #FFFFFF;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            flex: none;
+            order: 0;
+            flex-grow: 0;
+        }
+
+        .field input {
+            width: 100%;
+            height: 30px;
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 500;
+            font-size: 20px;
+            line-height: 150%;
+            color: #000000;
+            border: none;
+            outline: none;
+            background: transparent;
+        }
+
+        .field input::placeholder {
+            color: #828282;
+        }
+
+        .field select {
+            width: 100%;
+            height: 30px;
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 500;
+            font-size: 20px;
+            line-height: 150%;
+            color: #000000;
+            border: none;
+            outline: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .field select option {
+            color: #000000;
+            padding: 8px;
+        }
+
+        .field select option:first-child {
+            color: #828282;
+        }
+
+        .right-section {
+            width: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+        }
+
+        .card {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 24px;
+            gap: 16px;
+            width: 539px;
+            height: 503px;
+            background: #828282;
+            border: 1px solid #000000;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.04);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-background {
+            position: absolute;
+            width: 417px;
+            height: 417px;
+            top: 43px;
+            left: 61px;
+            background: url('https://upload.wikimedia.org/wikipedia/sco/thumb/5/53/Arsenal_FC.svg/1741px-Arsenal_FC.svg.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.2;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .card-title {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 700;
+            font-size: 48px;
+            line-height: 100%;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 600;
+            font-size: 24px;
+            line-height: 100%;
+            color: #FFFFFF;
+            margin-bottom: 24px;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: #FFFFFF;
+            margin: 16px 0;
+        }
+
+        .info-section {
+            margin-top: 16px;
+        }
+
+        .info-title {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 600;
+            font-size: 20px;
+            line-height: 150%;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+        }
+
+        .info-list {
+            list-style-type: none;
+        }
+
+        .info-list li {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 150%;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+            position: relative;
+            padding-left: 16px;
+        }
+
+        .info-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #FFFFFF;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+                width: 100%;
+            }
+            
+            .left-section, .right-section {
+                width: 100%;
+            }
+            
+            .card {
+                width: 100%;
+                max-width: 539px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <h1 class="title">The Short Introduction</h1>
+            
+            <div class="content">
+                <div class="input-group">
+                    <div class="field">
+                        <input type="text" id="name" placeholder="Name">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <div class="field">
+                        <input type="email" id="email" placeholder="email@domain.com">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <div class="field">
+                        <select id="football-team">
+                            <option value="" disabled selected>Football (Soccer) Team</option>
+                            <option value="Chelsea">Chelsea</option>
+                            <option value="Man United">Man United</option>
+                            <option value="Man City">Man City</option>
+                            <option value="Arsenal" selected>Arsenal</option>
+                            <option value="Tottenham (Spurs)">Tottenham (Spurs)</option>
+                            <option value="Liverpool">Liverpool</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-section">
+            <div class="card">
+                <div class="card-background"></div>
+                <div class="card-content">
+                    <h2 class="card-title">ARSENAL</h2>
+                    <h3 class="card-subtitle">FOOTBALL CLUB</h3>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="info-section">
+                        <h4 class="info-title">Club Information</h4>
+                        <ul class="info-list">
+                            <li>Founded: 1886</li>
+                            <li>Stadium: Emirates Stadium</li>
+                            <li>Location: London, England</li>
+                            <li>Nickname: The Gunners</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h4 class="info-title">Honors</h4>
+                        <ul class="info-list">
+                            <li>Premier League: 13 titles</li>
+                            <li>FA Cup: 14 titles</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load user data from localStorage and populate input fields
+        document.addEventListener('DOMContentLoaded', function() {
+            const userName = localStorage.getItem('userName');
+            const userEmail = localStorage.getItem('userEmail');
+            const userTeam = localStorage.getItem('userTeam');
+            
+            // Update the input fields with user information
+            if (userName) {
+                document.getElementById('name').value = userName;
+            }
+            
+            if (userEmail) {
+                document.getElementById('email').value = userEmail;
+            }
+            
+            if (userTeam) {
+                document.getElementById('football-team').value = userTeam;
+            }
+        });
+
+        // Update card when team selection changes
+        document.getElementById('football-team').addEventListener('change', function() {
+            const selectedTeam = this.value;
+            // In a complete implementation, this would update the card content
+            // based on the selected team
+            if (selectedTeam !== 'Arsenal') {
+                alert('Card content would update for ' + selectedTeam + ' in a full implementation.');
+            }
+        });
+    </script>
+</body>
+</html>
