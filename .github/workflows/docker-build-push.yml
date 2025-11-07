@@ -16,6 +16,34 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Debug - Show repository contents
+      run: |
+        echo "=== Current Directory ==="
+        pwd
+        echo ""
+        echo "=== All Files ==="
+        ls -la
+        echo ""
+        echo "=== Looking for Dockerfile specifically ==="
+        find . -name "Dockerfile" -o -name "dockerfile" -o -name "DOCKERFILE"
+        echo ""
+        echo "=== Checking if Dockerfile exists ==="
+        if [ -f "Dockerfile" ]; then
+          echo "✓ Dockerfile found!"
+          echo "=== Dockerfile content ==="
+          cat Dockerfile
+        else
+          echo "✗ Dockerfile NOT found!"
+          echo "=== Git ls-files ==="
+          git ls-files
+          exit 1
+        fi
+        echo ""
+        echo "=== File Stats ==="
+        stat Dockerfile || echo "stat failed"
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -40,6 +68,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: .
+        file: ./Dockerfile
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
@@ -47,13 +76,4 @@ jobs:
         cache-to: type=gha,mode=max
 
     - name: Image digest
-      run: echo "Image pushed with digest ${{ steps.build.outputs.digest }}"
-
-    - name: Debug - List files
-      run: |
-        echo "Current directory:"
-        pwd
-        echo "Files in current directory:"
-        ls -la
-        echo "Checking for Dockerfile:"
-        cat Dockerfile || echo "Dockerfile not found!"
+      run: echo "Image pushed successfully!"
