@@ -19,4 +19,5 @@ spec:
           - blocked
     ports:
     - protocol: TCP
+
       port: 80
