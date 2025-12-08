@@ -77,7 +77,7 @@ def find_node_exporter():
                 Path("/usr/bin/node_exporter"),
                 Path.home() / "node_exporter" / "node_exporter",
                 Path("node_exporter"),
-                Path.home() / ".local/bin/node_exporter"),
+                Path.home() / ".local/bin/node_exporter",
             ]
             possible_locations.extend(linux_paths)
             
@@ -110,7 +110,7 @@ def find_node_exporter():
             Path("/usr/bin/node_exporter"),
             Path.home() / "node_exporter" / "node_exporter",
             Path("node_exporter"),
-            Path.home() / ".local/bin/node_exporter"),
+            Path.home() / ".local/bin/node_exporter",
             Path("/opt/node_exporter/node_exporter"),
         ]
     
