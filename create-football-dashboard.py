@@ -2,6 +2,7 @@
 """
 Create Football App Dashboard in Grafana
 Automatically creates a custom dashboard with Football App metrics
+Works with both NodePort and port-forwarded Grafana
 """
 
 import json
@@ -160,9 +161,9 @@ def create_dashboard():
     
     return dashboard
 
-def send_to_grafana(dashboard):
+def send_to_grafana(dashboard, grafana_url):
     """Send dashboard to Grafana API"""
-    grafana_url = "http://localhost:30030/api/dashboards/db"
+    api_url = f"{grafana_url}/api/dashboards/db"
     username = "admin"
     password = "admin"
     
@@ -170,7 +171,7 @@ def send_to_grafana(dashboard):
         # Create request
         data = json.dumps(dashboard).encode('utf-8')
         req = urllib.request.Request(
-            grafana_url,
+            api_url,
             data=data,
             headers={'Content-Type': 'application/json'}
         )
@@ -180,7 +181,7 @@ def send_to_grafana(dashboard):
         req.add_header('Authorization', f'Basic {credentials}')
         
         # Send request
-        response = urllib.request.urlopen(req)
+        response = urllib.request.urlopen(req, timeout=10)
         
         if response.status == 200:
             result = json.loads(response.read().decode())
@@ -188,11 +189,62 @@ def send_to_grafana(dashboard):
         
         return False, ""
         
+    except urllib.error.HTTPError as e:
+        if e.code == 409:
+            return True, " (dashboard already exists - updated)"
+        return False, f"HTTP Error {e.code}: {e.reason}"
+    except urllib.error.URLError as e:
+        return False, f"Connection Error: {e.reason}"
     except Exception as e:
         return False, str(e)
 
+def check_grafana_accessible(url):
+    """Check if Grafana is accessible"""
+    try:
+        response = urllib.request.urlopen(f"{url}/api/health", timeout=5)
+        return response.status == 200
+    except:
+        return False
+
 def main():
     print_header("📊 Creating Football App Dashboard in Grafana")
+    
+    # Try different Grafana URLs (port-forward first, then NodePort)
+    grafana_urls = [
+        ("http://localhost:3000", "Port-forwarded"),
+        ("http://localhost:30030", "NodePort"),
+    ]
+    
+    print_color("Detecting Grafana location...", Colors.BLUE)
+    
+    grafana_url = None
+    connection_type = None
+    
+    for url, conn_type in grafana_urls:
+        print_color(f"  Trying {url} ({conn_type})...", Colors.YELLOW)
+        if check_grafana_accessible(url):
+            print_color(f"  ✅ Found Grafana at {url}", Colors.GREEN)
+            grafana_url = url
+            connection_type = conn_type
+            break
+        else:
+            print_color(f"  ❌ Not accessible", Colors.RED)
+    
+    if not grafana_url:
+        print()
+        print_color("❌ Grafana is not accessible!", Colors.RED)
+        print()
+        print_color("Please make sure Grafana is running:", Colors.YELLOW)
+        print("  1. Check if deployed: kubectl get pods")
+        print("  2. Start port-forward: python start-port-forwards.py")
+        print("  3. Or manually: kubectl port-forward service/grafana 3000:3000")
+        print()
+        print_color("Then try this script again", Colors.CYAN)
+        sys.exit(1)
+    
+    print()
+    print_color(f"Using Grafana at: {grafana_url} ({connection_type})", Colors.CYAN)
+    print()
     
     print_color("Creating dashboard configuration...", Colors.BLUE)
     dashboard = create_dashboard()
@@ -200,16 +252,21 @@ def main():
     print()
     
     print_color("Sending to Grafana...", Colors.BLUE)
-    success, url_or_error = send_to_grafana(dashboard)
+    success, url_or_error = send_to_grafana(dashboard, grafana_url)
     
     if success:
         print_color("✅ Dashboard created successfully!", Colors.GREEN)
         print()
         print_color("Access your dashboard:", Colors.CYAN)
-        print(f"  http://localhost:30030{url_or_error}")
+        if url_or_error and url_or_error.startswith('/'):
+            print(f"  {grafana_url}{url_or_error}")
+        else:
+            print(f"  {grafana_url}/dashboards")
+            if url_or_error:
+                print_color(f"  Note: {url_or_error}", Colors.YELLOW)
         print()
         print_color("Or navigate manually:", Colors.YELLOW)
-        print("  1. Open: http://localhost:30030")
+        print(f"  1. Open: {grafana_url}")
         print("  2. Go to: Dashboards → Browse")
         print("  3. Find: 'Football Introduction App Metrics'")
         print()
@@ -221,13 +278,23 @@ def main():
         print("  • Current Request Rate")
         print("  • Pod Status Table")
         print()
+        print_color("Generate traffic to see metrics:", Colors.YELLOW)
+        print("  # Generate 100 requests")
+        if connection_type == "Port-forwarded":
+            print("  for i in {1..100}; do curl -s http://localhost:8080 > /dev/null; done")
+        else:
+            print("  for i in {1..100}; do curl -s http://localhost:8080 > /dev/null; done")
+        print()
     else:
         print_color(f"❌ Failed to create dashboard: {url_or_error}", Colors.RED)
         print()
         print_color("Manual steps:", Colors.YELLOW)
-        print("1. Make sure Grafana is running: http://localhost:30030")
-        print("2. Check Prometheus data source is configured")
-        print("3. Create dashboard manually with these queries:")
+        print(f"1. Open Grafana: {grafana_url}")
+        print("2. Login: admin / admin")
+        print("3. Check Prometheus data source exists:")
+        print("   - Go to: Connections → Data Sources")
+        print("   - Should see: Prometheus")
+        print("4. Create dashboard manually with these queries:")
         print()
         print_color("Useful queries:", Colors.CYAN)
         print("  rate(nginx_http_requests_total{job='football-app'}[5m])")
