@@ -32,7 +32,7 @@ scrape_configs:
   # Football App - Direct scraping
   - job_name: 'football-app'
     static_configs:
-      - targets: ['host.docker.internal:8080']  # NodePort from host
+      - targets: ['host.docker.internal:30113']  # NodePort from host
         labels:
           app: 'football-intro-app'
           environment: 'kubernetes'
@@ -99,5 +99,4 @@ scrape_configs:
       
       - source_labels: [__meta_kubernetes_service_name]
         action: replace
-
         target_label: kubernetes_service_name
