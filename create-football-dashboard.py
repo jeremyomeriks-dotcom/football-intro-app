@@ -1,5 +1,3 @@
-[file name]: create-football-dashboard.py
-[file content begin]
 #!/usr/bin/env python3
 """
 Create Football App Dashboard in Grafana
@@ -155,35 +153,6 @@ def create_dashboard():
                         }
                     ]
                 }
-            ],
-            "links": [
-                {
-                    "icon": "external link",
-                    "tags": [],
-                    "targetBlank": True,
-                    "title": "App Metrics Dashboard",
-                    "tooltip": "View simple metrics dashboard in the app",
-                    "type": "link",
-                    "url": "http://localhost:8080/metrics-dashboard"
-                },
-                {
-                    "icon": "external link",
-                    "tags": [],
-                    "targetBlank": True,
-                    "title": "Raw Metrics",
-                    "tooltip": "View raw Prometheus metrics",
-                    "type": "link",
-                    "url": "http://localhost:8080/app-metrics"
-                },
-                {
-                    "icon": "external link",
-                    "tags": [],
-                    "targetBlank": True,
-                    "title": "Main Application",
-                    "tooltip": "Return to main football application",
-                    "type": "link",
-                    "url": "http://localhost:8080"
-                }
             ]
         },
         "overwrite": True,
@@ -192,32 +161,199 @@ def create_dashboard():
     
     return dashboard
 
-# ... rest of the file remains the same ...
+def test_credentials(grafana_url, username, password):
+    """Test if credentials work"""
+    try:
+        req = urllib.request.Request(f"{grafana_url}/api/user")
+        credentials = base64.b64encode(f"{username}:{password}".encode()).decode()
+        req.add_header('Authorization', f'Basic {credentials}')
+        response = urllib.request.urlopen(req, timeout=5)
+        return response.status == 200
+    except:
+        return False
 
-    print_color("Dashboard shows:", Colors.CYAN)
-    print("  • HTTP Request Rate")
-    print("  • Active Connections")
-    print("  • Total Requests")
-    print("  • Active Pods")
-    print("  • Current Request Rate")
-    print("  • Pod Status Table")
-    print()
-    print_color("Access all monitoring tools:", Colors.CYAN)
-    print("  🏈 Football App:        http://localhost:8080")
-    print("  📊 App Metrics Page:    http://localhost:8080/metrics-dashboard")
-    print("  📡 Raw Metrics:         http://localhost:8080/app-metrics")
-    print("  📈 Prometheus:          http://localhost:9090")
-    print("  📋 Grafana:             http://localhost:3000 (admin/admin)")
-    print()
-    print_color("Generate traffic to see metrics:", Colors.YELLOW)
-    print("  # Generate 100 requests")
-    print("  for i in {1..100}; do curl -s http://localhost:8080 > /dev/null; done")
-    print()
-    print_color("View metrics directly in the app:", Colors.YELLOW)
-    print("  1. Open: http://localhost:8080/metrics-dashboard")
-    print("  2. See real-time metrics from Prometheus")
-    print("  3. Auto-refreshes every 10 seconds")
-    print()
+def send_to_grafana(dashboard, grafana_url, username="admin", password="admin"):
+    """Send dashboard to Grafana API"""
+    api_url = f"{grafana_url}/api/dashboards/db"
+    
+    try:
+        # Create request
+        data = json.dumps(dashboard).encode('utf-8')
+        req = urllib.request.Request(
+            api_url,
+            data=data,
+            headers={'Content-Type': 'application/json'}
+        )
+        
+        # Add basic auth
+        credentials = base64.b64encode(f"{username}:{password}".encode()).decode()
+        req.add_header('Authorization', f'Basic {credentials}')
+        
+        # Send request
+        response = urllib.request.urlopen(req, timeout=10)
+        
+        if response.status == 200:
+            result = json.loads(response.read().decode())
+            return True, result.get('url', '')
+        
+        return False, ""
+        
+    except urllib.error.HTTPError as e:
+        if e.code == 409:
+            return True, " (dashboard already exists - updated)"
+        if e.code == 401:
+            return False, "Authentication failed - incorrect username/password"
+        return False, f"HTTP Error {e.code}: {e.reason}"
+    except urllib.error.URLError as e:
+        return False, f"Connection Error: {e.reason}"
+    except Exception as e:
+        return False, str(e)
 
-# ... rest of the file remains the same ...
-[file content end]
+def check_grafana_accessible(url):
+    """Check if Grafana is accessible"""
+    try:
+        response = urllib.request.urlopen(f"{url}/api/health", timeout=5)
+        return response.status == 200
+    except:
+        return False
+
+def main():
+    print_header("📊 Creating Football App Dashboard in Grafana")
+    
+    # Try different Grafana URLs (port-forward first, then NodePort)
+    grafana_urls = [
+        ("http://localhost:3000", "Port-forwarded"),
+        ("http://localhost:30030", "NodePort"),
+    ]
+    
+    print_color("Detecting Grafana location...", Colors.BLUE)
+    
+    grafana_url = None
+    connection_type = None
+    
+    for url, conn_type in grafana_urls:
+        print_color(f"  Trying {url} ({conn_type})...", Colors.YELLOW)
+        if check_grafana_accessible(url):
+            print_color(f"  ✅ Found Grafana at {url}", Colors.GREEN)
+            grafana_url = url
+            connection_type = conn_type
+            break
+        else:
+            print_color(f"  ❌ Not accessible", Colors.RED)
+    
+    if not grafana_url:
+        print()
+        print_color("❌ Grafana is not accessible!", Colors.RED)
+        print()
+        print_color("Please make sure Grafana is running:", Colors.YELLOW)
+        print("  1. Check if deployed: kubectl get pods")
+        print("  2. Start port-forward: python start-port-forwards.py")
+        print("  3. Or manually: kubectl port-forward service/grafana 3000:3000")
+        print()
+        print_color("Then try this script again", Colors.CYAN)
+        sys.exit(1)
+    
+    print()
+    print_color(f"Using Grafana at: {grafana_url} ({connection_type})", Colors.CYAN)
+    print()
+    
+    # Test credentials
+    print_color("Testing Grafana credentials...", Colors.BLUE)
+    username = "admin"
+    password = "admin"
+    
+    if test_credentials(grafana_url, username, password):
+        print_color(f"✅ Credentials working (admin/admin)", Colors.GREEN)
+    else:
+        print_color("⚠️  Default credentials (admin/admin) not working", Colors.YELLOW)
+        print()
+        print_color("Please enter Grafana credentials:", Colors.CYAN)
+        try:
+            username = input("Username [admin]: ").strip() or "admin"
+            import getpass
+            password = getpass.getpass("Password: ").strip()
+            
+            if test_credentials(grafana_url, username, password):
+                print_color("✅ Credentials verified!", Colors.GREEN)
+            else:
+                print_color("❌ Invalid credentials", Colors.RED)
+                print()
+                print_color("Please check your Grafana login at:", Colors.YELLOW)
+                print(f"  {grafana_url}")
+                sys.exit(1)
+        except KeyboardInterrupt:
+            print()
+            sys.exit(1)
+    
+    print()
+    
+    print_color("Creating dashboard configuration...", Colors.BLUE)
+    dashboard = create_dashboard()
+    print_color("✅ Dashboard configuration created", Colors.GREEN)
+    print()
+    
+    print_color("Sending to Grafana...", Colors.BLUE)
+    success, url_or_error = send_to_grafana(dashboard, grafana_url, username, password)
+    
+    if success:
+        print_color("✅ Dashboard created successfully!", Colors.GREEN)
+        print()
+        print_color("Access your dashboard:", Colors.CYAN)
+        if url_or_error and url_or_error.startswith('/'):
+            print(f"  {grafana_url}{url_or_error}")
+        else:
+            print(f"  {grafana_url}/dashboards")
+            if url_or_error:
+                print_color(f"  Note: {url_or_error}", Colors.YELLOW)
+        print()
+        print_color("Or navigate manually:", Colors.YELLOW)
+        print(f"  1. Open: {grafana_url}")
+        print("  2. Go to: Dashboards → Browse")
+        print("  3. Find: 'Football Introduction App Metrics'")
+        print()
+        print_color("Dashboard shows:", Colors.CYAN)
+        print("  • HTTP Request Rate")
+        print("  • Active Connections")
+        print("  • Total Requests")
+        print("  • Active Pods")
+        print("  • Current Request Rate")
+        print("  • Pod Status Table")
+        print()
+        print_color("Generate traffic to see metrics:", Colors.YELLOW)
+        print("  # Generate 100 requests")
+        if connection_type == "Port-forwarded":
+            print("  for i in {1..100}; do curl -s http://localhost:8080 > /dev/null; done")
+        else:
+            print("  for i in {1..100}; do curl -s http://localhost:8080 > /dev/null; done")
+        print()
+    else:
+        print_color(f"❌ Failed to create dashboard: {url_or_error}", Colors.RED)
+        print()
+        print_color("Manual steps:", Colors.YELLOW)
+        print(f"1. Open Grafana: {grafana_url}")
+        print("2. Login: admin / admin")
+        print("3. Check Prometheus data source exists:")
+        print("   - Go to: Connections → Data Sources")
+        print("   - Should see: Prometheus")
+        print("4. Create dashboard manually with these queries:")
+        print()
+        print_color("Useful queries:", Colors.CYAN)
+        print("  rate(nginx_http_requests_total{job='football-app'}[5m])")
+        print("  nginx_connections_active{job='football-app'}")
+        print("  sum(nginx_http_requests_total{job='football-app'})")
+        print()
+        sys.exit(1)
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print()
+        print_color("\n⚠️  Cancelled", Colors.YELLOW)
+        sys.exit(1)
+    except Exception as e:
+        print()
+        print_color(f"❌ Error: {e}", Colors.RED)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
