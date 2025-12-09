@@ -161,11 +161,20 @@ def create_dashboard():
     
     return dashboard
 
-def send_to_grafana(dashboard, grafana_url):
+def test_credentials(grafana_url, username, password):
+    """Test if credentials work"""
+    try:
+        req = urllib.request.Request(f"{grafana_url}/api/user")
+        credentials = base64.b64encode(f"{username}:{password}".encode()).decode()
+        req.add_header('Authorization', f'Basic {credentials}')
+        response = urllib.request.urlopen(req, timeout=5)
+        return response.status == 200
+    except:
+        return False
+
+def send_to_grafana(dashboard, grafana_url, username="admin", password="admin"):
     """Send dashboard to Grafana API"""
     api_url = f"{grafana_url}/api/dashboards/db"
-    username = "admin"
-    password = "admin"
     
     try:
         # Create request
@@ -192,6 +201,8 @@ def send_to_grafana(dashboard, grafana_url):
     except urllib.error.HTTPError as e:
         if e.code == 409:
             return True, " (dashboard already exists - updated)"
+        if e.code == 401:
+            return False, "Authentication failed - incorrect username/password"
         return False, f"HTTP Error {e.code}: {e.reason}"
     except urllib.error.URLError as e:
         return False, f"Connection Error: {e.reason}"
@@ -246,13 +257,43 @@ def main():
     print_color(f"Using Grafana at: {grafana_url} ({connection_type})", Colors.CYAN)
     print()
     
+    # Test credentials
+    print_color("Testing Grafana credentials...", Colors.BLUE)
+    username = "admin"
+    password = "admin"
+    
+    if test_credentials(grafana_url, username, password):
+        print_color(f"✅ Credentials working (admin/admin)", Colors.GREEN)
+    else:
+        print_color("⚠️  Default credentials (admin/admin) not working", Colors.YELLOW)
+        print()
+        print_color("Please enter Grafana credentials:", Colors.CYAN)
+        try:
+            username = input("Username [admin]: ").strip() or "admin"
+            import getpass
+            password = getpass.getpass("Password: ").strip()
+            
+            if test_credentials(grafana_url, username, password):
+                print_color("✅ Credentials verified!", Colors.GREEN)
+            else:
+                print_color("❌ Invalid credentials", Colors.RED)
+                print()
+                print_color("Please check your Grafana login at:", Colors.YELLOW)
+                print(f"  {grafana_url}")
+                sys.exit(1)
+        except KeyboardInterrupt:
+            print()
+            sys.exit(1)
+    
+    print()
+    
     print_color("Creating dashboard configuration...", Colors.BLUE)
     dashboard = create_dashboard()
     print_color("✅ Dashboard configuration created", Colors.GREEN)
     print()
     
     print_color("Sending to Grafana...", Colors.BLUE)
-    success, url_or_error = send_to_grafana(dashboard, grafana_url)
+    success, url_or_error = send_to_grafana(dashboard, grafana_url, username, password)
     
     if success:
         print_color("✅ Dashboard created successfully!", Colors.GREEN)
